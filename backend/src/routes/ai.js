@@ -47,4 +47,54 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.post('/', async (req, res) => {
+  const { from, to, startDate, endDate, duration, preferences, budget, groupSize } = req.body;
+  if (!from || !to) {
+    return res.status(400).json({ error: 'Missing parameters' });
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  // Build enhanced prompt
+  const prompt = `I am a first-time traveler going from ${from} to ${to}.
+
+Here are my trip details:
+- Dates: ${startDate || 'Not specified'} to ${endDate || 'Not specified'}
+- Duration: ${duration || 'Not specified'}
+- Preferences: ${preferences && preferences.length ? preferences.join(', ') : 'None'}
+- Budget: ₹${budget || 'Not specified'}
+- Group size: ${groupSize || 'Not specified'}
+
+Please provide the following:
+1. The cheapest way to travel in detailed, step-by-step instructions so that even a child could follow.
+2. A well-structured list of local homestays or PG accommodations at the destination with brief descriptions.
+3. A list of affordable local eateries at the destination, highlighting their specialties.`;
+
+  try {
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: prompt }
+              ],
+              role: 'user'
+            }
+          ]
+        })
+      }
+    );
+    const data = await geminiResponse.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    res.json({ answer: text });
+  } catch (err) {
+    console.error('Gemini API error:', err);
+    res.status(500).json({ error: 'Failed to fetch travel options' });
+  }
+});
+
 export default router; 

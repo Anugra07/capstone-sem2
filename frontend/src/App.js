@@ -6,12 +6,13 @@ import Box from '@mui/material/Box';
 import palette from './theme/palette';
 import typography from './theme/typography';
 import Navbar from './components/Navbar';
-import Breadcrumbs from './components/Breadcrumbs';
 import HomePage from './pages/HomePage';
 import PlannerPage from './pages/PlannerPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import '@fontsource/inter';
+import '@fontsource/poppins';
+import '@fontsource/playfair-display';
 
 const theme = createTheme({
   palette,
@@ -23,17 +24,24 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          width: '100vw',
+          background: theme.palette.background.gradient,
+          position: 'fixed',
+          inset: 0,
+          zIndex: -1,
+        }}
+      />
       <Router>
         <Navbar />
-        <Breadcrumbs />
-        <Box sx={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/planner" element={<PlannerPage />} />
-            <Route path="/" element={<HomePage />} />
-          </Routes>
-        </Box>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/planner" element={<PlannerPage />} />
+          <Route path="/" element={<HomePage />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   );
