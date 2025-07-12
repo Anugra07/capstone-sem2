@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -21,19 +21,13 @@ import {
   AccountCircle as AccountCircleIcon
 } from '@mui/icons-material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -44,16 +38,14 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
+    logout();
     handleMenuClose();
-    navigate('/');
   };
 
   const navLinks = [
     { label: 'Home', to: '/' },
     { label: 'Planner', to: '/planner' },
+    ...(user ? [{ label: 'Profile', to: '/profile' }] : []),
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -184,7 +176,13 @@ function Navbar() {
                   }
                 }}
               >
-                <MenuItem onClick={handleMenuClose} sx={{ py: 1.5 }}>
+                <MenuItem 
+                  onClick={() => {
+                    handleMenuClose();
+                    navigate('/profile');
+                  }} 
+                  sx={{ py: 1.5 }}
+                >
                   <AccountCircleIcon sx={{ mr: 2, color: 'text.secondary' }} />
                   Profile
                 </MenuItem>

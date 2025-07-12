@@ -5,11 +5,13 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import palette from './theme/palette';
 import typography from './theme/typography';
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import PlannerPage from './pages/PlannerPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import ProfilePage from './pages/ProfilePage';
 import '@fontsource/inter';
 import '@fontsource/poppins';
 import '@fontsource/playfair-display';
@@ -35,13 +37,16 @@ function App() {
         }}
       />
       <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/planner" element={<PlannerPage />} />
-          <Route path="/" element={<HomePage />} />
-        </Routes>
+        <AuthProvider>
+          <Navbar />
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/planner" element={<PlannerPage />} />
+            <Route path="/" element={<HomePage />} />
+          </Routes>
+        </AuthProvider>
       </Router>
     </ThemeProvider>
   );

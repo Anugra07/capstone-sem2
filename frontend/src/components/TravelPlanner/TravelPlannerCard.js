@@ -40,7 +40,7 @@ function TravelPlannerCard({ onPlan }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/ai', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/ai`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -56,19 +56,85 @@ function TravelPlannerCard({ onPlan }) {
       });
       const data = await res.json();
       setLoading(false);
+      
       if (data.error) {
+        console.log('❌ API Error:', data.error);
         onPlan && onPlan({ error: data.error });
       } else {
-        // Parse Gemini answer into sections
+        // Log the raw Gemini answer
         const answer = data.answer || '';
-        // Simple parsing: split by numbered sections
-        const sections = answer.split(/\n\d+\. /).map((s, i) => (i === 0 ? s : (i + '. ' + s)));
+        console.log('🟢 Gemini Raw Answer:', answer);
+        
+        // Enhanced parsing: try multiple approaches
+        console.log('🔢 Attempting to parse sections...');
+        
         let steps = '', accommodations = '', foods = '';
-        sections.forEach(section => {
-          if (/cheapest way/i.test(section)) steps = section;
-          else if (/homestays|accommodations|pg/i.test(section)) accommodations = section;
-          else if (/eateries|foods|restaurants/i.test(section)) foods = section;
+        
+        // Method 1: Split by numbered sections (improved)
+        const sections = answer.split(/\n\d+\. /).map((s, i) => {
+          if (i === 0) return s;
+          return (i + '. ' + s);
         });
+        console.log('🔢 Method 1 - Numbered sections:', sections.length);
+        
+        // Method 2: Split by common section headers
+        const sectionHeaders = answer.split(/\n(?:.*?(?:cheapest|travel|way|homestay|accommodation|eatery|food|restaurant).*?)\n/i);
+        console.log('🔢 Method 2 - Header sections:', sectionHeaders.length);
+        
+        // Method 3: Look for specific patterns in the entire text
+        const cheapestMatch = answer.match(/(?:.*?cheapest.*?way.*?)(?=\n\d+\.|\n\n|$)/is);
+        const accommodationMatch = answer.match(/(?:.*?homestay.*?accommodation.*?)(?=\n\d+\.|\n\n|$)/is);
+        const foodMatch = answer.match(/(?:.*?eatery.*?food.*?restaurant.*?)(?=\n\d+\.|\n\n|$)/is);
+        
+        console.log('🔢 Method 3 - Pattern matches:', {
+          cheapest: !!cheapestMatch,
+          accommodation: !!accommodationMatch,
+          food: !!foodMatch
+        });
+        
+        // Try to extract sections using multiple methods
+        sections.forEach((section, index) => {
+          console.log(`📋 Section ${index}:`, section.substring(0, 100) + '...');
+          
+          const sectionLower = section.toLowerCase();
+          
+          // More specific matching to avoid conflicts
+          if (sectionLower.includes('cheapest') && sectionLower.includes('way')) {
+            steps = section;
+            console.log('✅ Found Steps Section (Method 1)');
+          }
+          else if (sectionLower.includes('homestay') || sectionLower.includes('accommodation')) {
+            accommodations = section;
+            console.log('✅ Found Accommodations Section (Method 1)');
+          }
+          else if (sectionLower.includes('eatery') || sectionLower.includes('food')) {
+            foods = section;
+            console.log('✅ Found Foods Section (Method 1)');
+          }
+        });
+        
+        // If Method 1 didn't work, try Method 3
+        if (!steps && cheapestMatch) {
+          steps = cheapestMatch[0];
+          console.log('✅ Found Steps Section (Method 3)');
+        }
+        if (!accommodations && accommodationMatch) {
+          accommodations = accommodationMatch[0];
+          console.log('✅ Found Accommodations Section (Method 3)');
+        }
+        if (!foods && foodMatch) {
+          foods = foodMatch[0];
+          console.log('✅ Found Foods Section (Method 3)');
+        }
+        
+        console.log('📊 Final Parsed Data:', {
+          steps: steps ? steps.substring(0, 100) + '...' : 'NOT FOUND',
+          accommodations: accommodations ? accommodations.substring(0, 100) + '...' : 'NOT FOUND',
+          foods: foods ? foods.substring(0, 100) + '...' : 'NOT FOUND'
+        });
+        
+        // Log the parsed sections
+        console.log('🟢 Parsed Sections:', { steps, accommodations, foods });
         onPlan && onPlan({ answer, steps, accommodations, foods });
       }
     } catch (err) {

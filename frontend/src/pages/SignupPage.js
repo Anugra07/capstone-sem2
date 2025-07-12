@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   Card,
   CardContent,
@@ -24,6 +25,7 @@ import {
 } from '@mui/icons-material';
 
 function SignupPage() {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -79,7 +81,7 @@ function SignupPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,8 +111,7 @@ function SignupPage() {
       }
 
       if (data.success) {
-        localStorage.setItem('token', data.data.token);
-        localStorage.setItem('user', JSON.stringify(data.data.user));
+        login(data.data.user, data.data.token);
         navigate('/planner');
       } else {
         setError(data.error || 'Signup failed. Please try again.');

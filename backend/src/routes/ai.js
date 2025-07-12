@@ -18,6 +18,11 @@ router.get('/', async (req, res) => {
 
   const apiKey = process.env.GEMINI_API_KEY;
 
+  if (!apiKey) {
+    console.log('❌ GEMINI_API_KEY not configured');
+    return res.status(500).json({ error: 'AI service not configured' });
+  }
+
   try {
     const geminiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -48,15 +53,22 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { from, to, startDate, endDate, duration, preferences, budget, groupSize } = req.body;
-  if (!from || !to) {
-    return res.status(400).json({ error: 'Missing parameters' });
-  }
+  try {
+    console.log('🟠 /api/ai POST route hit', req.body);
+    const { from, to, startDate, endDate, duration, preferences, budget, groupSize } = req.body;
+    if (!from || !to) {
+      return res.status(400).json({ error: 'Missing parameters' });
+    }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
-  // Build enhanced prompt
-  const prompt = `I am a first-time traveler going from ${from} to ${to}.
+    if (!apiKey) {
+      console.log('❌ GEMINI_API_KEY not configured');
+      return res.status(500).json({ error: 'AI service not configured' });
+    }
+
+    // Build enhanced prompt
+    const prompt = `I am a first-time traveler going from ${from} to ${to}.
 
 Here are my trip details:
 - Dates: ${startDate || 'Not specified'} to ${endDate || 'Not specified'}
@@ -70,31 +82,41 @@ Please provide the following:
 2. A well-structured list of local homestays or PG accommodations at the destination with brief descriptions.
 3. A list of affordable local eateries at the destination, highlighting their specialties.`;
 
-  try {
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: prompt }
-              ],
-              role: 'user'
-            }
-          ]
-        })
-      }
-    );
-    const data = await geminiResponse.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    res.json({ answer: text });
+    try {
+      const geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: prompt }
+                ],
+                role: 'user'
+              }
+            ]
+          })
+        }
+      );
+      const data = await geminiResponse.json();
+      console.log('🔴 Gemini Full API Response:', JSON.stringify(data, null, 2));
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      res.json({ answer: text });
+    } catch (err) {
+      console.error('Gemini API error:', err);
+      res.status(500).json({ error: 'Failed to fetch travel options' });
+    }
   } catch (err) {
-    console.error('Gemini API error:', err);
-    res.status(500).json({ error: 'Failed to fetch travel options' });
+    console.error('🔥 Error in /api/ai:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+router.post('/test', (req, res) => {
+  console.log('✅ /api/ai/test hit!');
+  res.json({ ok: true });
 });
 
 export default router; 
