@@ -12,6 +12,8 @@ import PlannerPage from './pages/PlannerPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
+import PlannedTripPage from './pages/PlannedTripPage';
+import SeasonalTreksPage from './pages/SeasonalTreksPage';
 import '@fontsource/inter';
 import '@fontsource/poppins';
 import '@fontsource/playfair-display';
@@ -44,6 +46,8 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/planner" element={<PlannerPage />} />
+            <Route path="/planned-trip" element={<PlannedTripPage />} />
+            <Route path="/seasonal-treks" element={<SeasonalTreksPage />} />
             <Route path="/" element={<HomePage />} />
           </Routes>
         </AuthProvider>

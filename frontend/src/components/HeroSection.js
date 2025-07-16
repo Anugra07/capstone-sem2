@@ -2,12 +2,10 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { Link } from 'react-router-dom';
 
-const heroBg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80'; // Spiti Valley placeholder
-
-// Mandala SVG pattern as a data URI (faint, white, low opacity)
-const mandalaPattern =
-  'url("data:image/svg+xml;utf8,<svg width=\'600\' height=\'600\' viewBox=\'0 0 600 600\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'><g opacity=\'0.08\'><circle cx=\'300\' cy=\'300\' r=\'280\' stroke=\'white\' stroke-width=\'2\'/><circle cx=\'300\' cy=\'300\' r=\'200\' stroke=\'white\' stroke-width=\'1.5\'/><circle cx=\'300\' cy=\'300\' r=\'120\' stroke=\'white\' stroke-width=\'1\'/><path d=\'M300 20 L320 300 L300 580 L280 300 Z\' stroke=\'white\' stroke-width=\'1\'/></g></svg>")';
+const heroBg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80';
+const mandalaPattern = 'url("/mandala-bg.svg")';
 
 function HeroSection() {
   return (
@@ -81,7 +79,8 @@ function HeroSection() {
               background: 'linear-gradient(90deg, #E55100 0%, #FF6B35 100%)',
             },
           }}
-          href="#planner"
+          component={Link}
+          to="/planner"
         >
           Start Planning
         </Button>
