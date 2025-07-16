@@ -34,7 +34,10 @@ router.get('/', async (req, res) => {
             {
               parts: [
                 {
-                  text: `I am a first-time traveler going from ${from} to ${to}. Please provide the following:\n1. The cheapest way to travel in detailed, step-by-step instructions so that even a child could follow.\n2. A well-structured list of local homestays or PG accommodations at the destination with brief descriptions.\n3. A list of affordable local eateries at the destination, highlighting their specialties.`
+                  text: `I am a first-time traveler going from ${from} to ${to}. Please provide the following:
+1. The cheapest way to travel in detailed, step-by-step instructions so that even a child could follow.
+2. A well-structured list of local homestays or PG accommodations at the destination with brief descriptions.
+3. A list of affordable local eateries at the destination, highlighting their specialties.`
                 }
               ],
               role: 'user'
@@ -55,7 +58,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     console.log('🟠 /api/ai POST route hit', req.body);
-    const { from, to, startDate, endDate, duration, preferences, budget, groupSize } = req.body;
+    const { from, to, startDate, endDate, budget, groupSize } = req.body;
     if (!from || !to) {
       return res.status(400).json({ error: 'Missing parameters' });
     }
@@ -72,15 +75,18 @@ router.post('/', async (req, res) => {
 
 Here are my trip details:
 - Dates: ${startDate || 'Not specified'} to ${endDate || 'Not specified'}
-- Duration: ${duration || 'Not specified'}
-- Preferences: ${preferences && preferences.length ? preferences.join(', ') : 'None'}
 - Budget: ₹${budget || 'Not specified'}
 - Group size: ${groupSize || 'Not specified'}
 
-Please provide the following:
-1. The cheapest way to travel in detailed, step-by-step instructions so that even a child could follow.
-2. A well-structured list of local homestays or PG accommodations at the destination with brief descriptions.
-3. A list of affordable local eateries at the destination, highlighting their specialties.`;
+Please provide the following in a clear, structured format:
+
+1. **Travel Route & Instructions**: The cheapest and most practical way to travel from ${from} to ${to}. Include step-by-step instructions, transportation options, estimated costs, and travel time.
+
+2. **Accommodations**: A list of local homestays, guesthouses, or budget accommodations at the destination. Include brief descriptions, approximate prices, and what makes each option special.
+
+3. **Local Eateries**: A list of affordable local restaurants and food joints. Highlight their specialties, approximate costs, and what makes them worth visiting.
+
+Please format your response clearly with numbered sections and bullet points for easy reading.`;
 
     try {
       const geminiResponse = await fetch(

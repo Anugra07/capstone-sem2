@@ -21,7 +21,6 @@ function HeroSection() {
         backgroundSize: 'cover, cover, 600px 600px',
         backgroundPosition: 'center, center, center',
         backgroundRepeat: 'no-repeat, no-repeat, repeat',
-        borderRadius: 4,
         overflow: 'hidden',
         mb: 6,
         boxShadow: '0 8px 32px rgba(44,62,80,0.10)',

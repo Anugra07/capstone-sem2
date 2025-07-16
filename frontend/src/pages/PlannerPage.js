@@ -11,16 +11,18 @@ function PlannerPage() {
   const [toastOpen, setToastOpen] = useState(false);
   const navigate = useNavigate();
 
+  const handlePlan = (data) => {
+    console.log('🎯 PlannerPage received data:', data);
+    setResult(data); 
+    setToastOpen(true); 
+    if (!data.error) {
+      navigate('/planned-trip', { state: { trip: data } });
+    }
+  };
+
   return (
     <Box sx={{ py: 6 }}>
-      <TravelPlannerCard onPlan={data => { 
-        console.log('🎯 PlannerPage received data:', data);
-        setResult(data); 
-        setToastOpen(true); 
-        if (!data.error) {
-          navigate('/planned-trip', { state: { trip: data } });
-        }
-      }} />
+      <TravelPlannerCard onPlan={handlePlan} />
       <ToastNotification open={toastOpen} message="Trip planned!" onClose={() => setToastOpen(false)} />
     </Box>
   );

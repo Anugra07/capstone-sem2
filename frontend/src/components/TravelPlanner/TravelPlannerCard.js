@@ -7,31 +7,16 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import AutocompleteCity from './AutocompleteCity';
 import DatePicker from './DatePicker';
-import Preferences from './Preferences';
 import BudgetSlider from './BudgetSlider';
 import GroupSizeSelector from './GroupSizeSelector';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ExploreIcon from '@mui/icons-material/Explore';
-
-const durations = [
-  { label: 'Weekend', value: 'weekend' },
-  { label: '1 Week', value: 'week' },
-  { label: '1 Month', value: 'month' },
-];
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 
 function TravelPlannerCard({ onPlan }) {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [duration, setDuration] = useState('weekend');
-  const [preferences, setPreferences] = useState([]);
   const [budget, setBudget] = useState(10000);
   const [groupSize, setGroupSize] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -48,8 +33,6 @@ function TravelPlannerCard({ onPlan }) {
           to,
           startDate,
           endDate,
-          duration,
-          preferences,
           budget,
           groupSize
         })
@@ -135,9 +118,21 @@ function TravelPlannerCard({ onPlan }) {
         
         // Log the parsed sections
         console.log('🟢 Parsed Sections:', { steps, accommodations, foods });
-        onPlan && onPlan({ answer, steps, accommodations, foods });
+        onPlan && onPlan({ 
+          from, 
+          to, 
+          startDate, 
+          endDate, 
+          budget, 
+          groupSize, 
+          answer, 
+          steps, 
+          accommodations, 
+          foods 
+        });
       }
     } catch (err) {
+      console.error('🔥 Error in handleSubmit:', err);
       setLoading(false);
       onPlan && onPlan({ error: 'Failed to fetch travel options' });
     }
@@ -151,157 +146,216 @@ function TravelPlannerCard({ onPlan }) {
         alignItems: 'center',
         justifyContent: 'center',
         py: { xs: 4, md: 8 },
+        px: { xs: 2, md: 4 },
       }}
     >
       <Card
-        elevation={8}
+        elevation={12}
         sx={{
-          width: { xs: '95vw', sm: 450 },
-          maxWidth: '95vw',
-          p: { xs: 2, sm: 5 },
-          borderRadius: 3,
-          boxShadow: '0 8px 32px rgba(44,62,80,0.12)',
-          background: 'rgba(255,255,255,0.85)',
-          backdropFilter: 'blur(12px)',
-          borderTop: '2px solid #FF6B35',
+          width: { xs: '100%', sm: 500, md: 550 },
+          maxWidth: '100%',
+          borderRadius: 4,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+          border: '1px solid rgba(255,255,255,0.2)',
           position: 'relative',
           overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #FF6B35 0%, #E55100 50%, #FF6B35 100%)',
+          }
         }}
       >
-        <CardContent sx={{ p: 0 }}>
-          <Typography
-            variant="h4"
-            align="center"
-            gutterBottom
-            sx={{
-              fontWeight: 700,
-              color: 'primary.main',
-              fontFamily: 'Poppins, Arial, sans-serif',
-              fontSize: 28,
-              mb: 3,
-            }}
-          >
-            Plan Your Offbeat Adventure
-          </Typography>
+        <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+          {/* Header */}
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <FlightTakeoffIcon 
+              sx={{ 
+                fontSize: 48, 
+                color: 'primary.main', 
+                mb: 2,
+                filter: 'drop-shadow(0 4px 8px rgba(255,107,53,0.3))'
+              }} 
+            />
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                color: 'primary.main',
+                fontFamily: 'Poppins, Arial, sans-serif',
+                fontSize: { xs: 24, md: 28 },
+                mb: 1,
+              }}
+            >
+              Plan Your Journey
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+                fontSize: 16,
+                fontFamily: 'Inter, Arial, sans-serif',
+              }}
+            >
+              Discover the best routes, accommodations, and local experiences
+            </Typography>
+          </Box>
+
           <Box
             component="form"
             onSubmit={handleSubmit}
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 2.5,
-              mt: 1,
+              gap: 3,
             }}
           >
-            {/* From Field with Icon */}
-            <Box sx={{ position: 'relative' }}>
-              <LocationOnIcon sx={{ position: 'absolute', left: 12, top: 18, color: '#FF6B35', fontSize: 22, zIndex: 2 }} />
-              <AutocompleteCity
-                label="From"
-                value={from}
-                onChange={setFrom}
-                sx={{
-                  pl: 4,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(30,58,138,0.04)',
-                  background: '#fff',
-                  '& .MuiInputBase-root': {
-                    borderRadius: 2,
-                  },
-                }}
-                InputProps={{
-                  startAdornment: <Box sx={{ width: 24 }} />,
-                }}
-              />
-            </Box>
-            {/* To Field with Icon */}
-            <Box sx={{ position: 'relative' }}>
-              <ExploreIcon sx={{ position: 'absolute', left: 12, top: 18, color: '#1E3A8A', fontSize: 22, zIndex: 2 }} />
-              <AutocompleteCity
-                label="To"
-                value={to}
-                onChange={setTo}
-                sx={{
-                  pl: 4,
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(30,58,138,0.04)',
-                  background: '#fff',
-                  '& .MuiInputBase-root': {
-                    borderRadius: 2,
-                  },
-                }}
-                InputProps={{
-                  startAdornment: <Box sx={{ width: 24 }} />,
-                }}
-              />
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <DatePicker label="Start Date" value={startDate} onChange={setStartDate} />
-              <DatePicker label="End Date" value={endDate} onChange={setEndDate} />
-            </Box>
-            <FormControl fullWidth>
-              <InputLabel id="duration-label">Trip Duration</InputLabel>
-              <Select
-                labelId="duration-label"
-                value={duration}
-                label="Trip Duration"
-                onChange={e => setDuration(e.target.value)}
-                sx={{ borderRadius: 2, background: '#fff', fontFamily: 'Inter, Arial, sans-serif' }}
-              >
-                {durations.map(opt => (
-                  <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Preferences value={preferences} onChange={setPreferences} />
-            <BudgetSlider value={budget} onChange={setBudget} />
-            <GroupSizeSelector value={groupSize} onChange={setGroupSize} />
-            {/* Map preview placeholder */}
-            <Paper
-              elevation={2}
+            {/* From Field */}
+            <AutocompleteCity
+              label="From"
+              value={from}
+              onChange={setFrom}
               sx={{
-                height: 120,
-                background: 'linear-gradient(90deg, #FFF8DC 60%, #FF6B35 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mb: 2,
-                borderRadius: 3,
-                boxShadow: '0 2px 8px rgba(255,215,0,0.08)',
+                '& .MuiInputBase-root': {
+                  borderRadius: 3,
+                  background: '#fff',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    boxShadow: '0 4px 16px rgba(255,107,53,0.12)',
+                  },
+                  '&.Mui-focused': {
+                    borderColor: 'primary.main',
+                    boxShadow: '0 4px 20px rgba(255,107,53,0.15)',
+                  }
+                },
               }}
-            >
-              <Typography variant="body2" color="text.secondary">[Map preview coming soon]</Typography>
-            </Paper>
-            <Divider sx={{ my: 2 }} />
+            />
+
+            {/* To Field */}
+            <AutocompleteCity
+              label="To"
+              value={to}
+              onChange={setTo}
+              sx={{
+                '& .MuiInputBase-root': {
+                  borderRadius: 3,
+                  background: '#fff',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    boxShadow: '0 4px 16px rgba(255,107,53,0.12)',
+                  },
+                  '&.Mui-focused': {
+                    borderColor: 'primary.main',
+                    boxShadow: '0 4px 20px rgba(255,107,53,0.15)',
+                  }
+                },
+              }}
+            />
+
+            {/* Date Fields */}
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <DatePicker 
+                label="Start Date" 
+                value={startDate} 
+                onChange={setStartDate}
+                sx={{
+                  flex: 1,
+                  '& .MuiInputBase-root': {
+                    borderRadius: 3,
+                    background: '#fff',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                  }
+                }}
+              />
+              <DatePicker 
+                label="End Date" 
+                value={endDate} 
+                onChange={setEndDate}
+                sx={{
+                  flex: 1,
+                  '& .MuiInputBase-root': {
+                    borderRadius: 3,
+                    background: '#fff',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                  }
+                }}
+              />
+            </Box>
+
+            {/* Budget Slider */}
+            <BudgetSlider 
+              value={budget} 
+              onChange={setBudget}
+              sx={{
+                '& .MuiSlider-root': {
+                  color: 'primary.main',
+                }
+              }}
+            />
+
+            {/* Group Size */}
+            <GroupSizeSelector 
+              value={groupSize} 
+              onChange={setGroupSize}
+              sx={{
+                '& .MuiInputBase-root': {
+                  borderRadius: 3,
+                  background: '#fff',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                }
+              }}
+            />
+
+            <Divider sx={{ my: 2, opacity: 0.3 }} />
+
+            {/* Submit Button */}
             <Button
               type="submit"
               variant="contained"
               size="large"
-              disabled={loading}
+              disabled={loading || !from || !to}
               sx={{
-                width: '100%',
-                height: 50,
-                borderRadius: 25,
+                height: 56,
+                borderRadius: 3,
                 fontWeight: 600,
                 fontFamily: 'Poppins, Arial, sans-serif',
                 fontSize: 16,
                 background: 'linear-gradient(90deg, #FF6B35 0%, #E55100 100%)',
                 color: '#fff',
-                boxShadow: '0 4px 16px rgba(255,107,53,0.18)',
+                boxShadow: '0 8px 24px rgba(255,107,53,0.25)',
                 textTransform: 'none',
                 letterSpacing: 0.5,
-                transition: 'transform 0.2s, box-shadow 0.2s',
+                transition: 'all 0.3s ease',
                 '&:hover': {
-                  transform: 'scale(1.02)',
-                  boxShadow: '0 8px 32px rgba(255,107,53,0.22)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 32px rgba(255,107,53,0.35)',
                   background: 'linear-gradient(90deg, #E55100 0%, #FF6B35 100%)',
                 },
                 '&:disabled': {
-                  opacity: 0.7,
+                  opacity: 0.6,
+                  transform: 'none',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                 },
               }}
             >
-              {loading ? <CircularProgress size={26} color="inherit" sx={{ verticalAlign: 'middle' }} /> : 'Plan Trip'}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+              ) : (
+                <FlightTakeoffIcon sx={{ mr: 1, fontSize: 20 }} />
+              )}
+              {loading ? 'Planning Your Trip...' : 'Plan My Journey'}
             </Button>
           </Box>
         </CardContent>

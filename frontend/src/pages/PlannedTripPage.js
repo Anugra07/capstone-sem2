@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -9,6 +9,12 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import HomeIcon from '@mui/icons-material/Home';
@@ -34,6 +40,11 @@ function PlannedTripPage() {
   const navigate = useNavigate();
   const data = location.state?.trip;
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [tripTitle, setTripTitle] = useState('');
+  const [saving, setSaving] = useState(false);
+
+
 
   if (!data) {
     return (
@@ -44,11 +55,13 @@ function PlannedTripPage() {
     );
   }
 
-  // Pick a hero image based on content (simple random for now)
-  const heroImage = heroImages[Math.floor(Math.random() * heroImages.length)];
+  // Pick a hero image based on content (use a stable index)
+  const heroImage = useMemo(() => {
+    return heroImages[Math.floor((data.from?.length || 0) % heroImages.length)];
+  }, [data.from]);
 
   // Custom markdown styles
-  const markdownSx = {
+  const markdownSx = useMemo(() => ({
     fontFamily: 'inherit',
     fontSize: 17,
     color: 'text.primary',
@@ -59,15 +72,72 @@ function PlannedTripPage() {
     '& blockquote': { background: '#fffbe6', borderLeft: '4px solid #FF6B35', p: 1, my: 2, fontStyle: 'italic' },
     '& a': { color: 'primary.main', textDecoration: 'underline' },
     '& p': { mb: 1 },
-  };
+  }), []);
 
-  // Save Trip handler (placeholder)
-  const handleSave = () => {
-    setToast({ open: true, message: 'Trip saved to your profile!', severity: 'success' });
-  };
+  // Save Trip handler
+  const handleSave = useCallback(() => {
+    setTripTitle(`${data.from} to ${data.to} - ${new Date().toLocaleDateString()}`);
+    setSaveDialogOpen(true);
+  }, [data.from, data.to]);
+
+  const handleSaveConfirm = useCallback(async () => {
+    if (!tripTitle.trim()) {
+      setToast({ open: true, message: 'Please enter a trip title', severity: 'error' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setToast({ open: true, message: 'Please login to save trips', severity: 'error' });
+        setSaveDialogOpen(false);
+        return;
+      }
+
+      const tripData = {
+        title: tripTitle,
+        from: data.from,
+        to: data.to,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        budget: data.budget,
+        groupSize: data.groupSize,
+        answer: data.answer,
+        steps: data.steps,
+        accommodations: data.accommodations,
+        foods: data.foods
+      };
+
+
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/saved-trips`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(tripData)
+      });
+
+      if (response.ok) {
+        setToast({ open: true, message: 'Trip saved successfully!', severity: 'success' });
+        setSaveDialogOpen(false);
+      } else {
+        const errorData = await response.json();
+
+        setToast({ open: true, message: errorData.error || 'Failed to save trip', severity: 'error' });
+      }
+    } catch (error) {
+      console.error('Error saving trip:', error);
+      setToast({ open: true, message: 'Failed to save trip', severity: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  }, [tripTitle, data, setSaveDialogOpen]);
 
   // Share handler
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     const shareUrl = window.location.origin + '/planned-trip';
     const shareText = `${data.answer?.split('\n')[0] || 'Check out my planned trip!'}\n${shareUrl}`;
     if (navigator.share) {
@@ -85,7 +155,7 @@ function PlannedTripPage() {
         setToast({ open: true, message: 'Could not copy link.', severity: 'error' });
       }
     }
-  };
+  }, [data.answer]);
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#f7f7fa' }}>
@@ -196,6 +266,37 @@ function PlannedTripPage() {
       <Box sx={{ maxWidth: 700, mx: 'auto', mt: 6, mb: 4, display: 'flex', justifyContent: 'flex-start' }}>
         <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate('/planner')}>Back to Planner</Button>
       </Box>
+
+      {/* Save Trip Dialog */}
+      <Dialog open={saveDialogOpen} onClose={() => setSaveDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Save Your Trip</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Trip Title"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={tripTitle}
+            onChange={(e) => setTripTitle(e.target.value)}
+            placeholder="Enter a title for your trip"
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSaveDialogOpen(false)}>Cancel</Button>
+          <Button 
+            onClick={handleSaveConfirm} 
+            variant="contained" 
+            disabled={saving || !tripTitle.trim()}
+            startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
+          >
+            {saving ? 'Saving...' : 'Save Trip'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Toast Notification */}
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast({ ...toast, open: false })} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert onClose={() => setToast({ ...toast, open: false })} severity={toast.severity} sx={{ width: '100%' }}>

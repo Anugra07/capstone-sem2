@@ -7,6 +7,7 @@ import palette from './theme/palette';
 import typography from './theme/typography';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import PlannerPage from './pages/PlannerPage';
 import LoginPage from './pages/LoginPage';
@@ -40,16 +41,21 @@ function App() {
       />
       <Router>
         <AuthProvider>
-          <Navbar />
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/planner" element={<PlannerPage />} />
-            <Route path="/planned-trip" element={<PlannedTripPage />} />
-            <Route path="/seasonal-treks" element={<SeasonalTreksPage />} />
-            <Route path="/" element={<HomePage />} />
-          </Routes>
+          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Navbar />
+            <Box sx={{ flex: 1 }}>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/planner" element={<PlannerPage />} />
+                <Route path="/planned-trip" element={<PlannedTripPage />} />
+                <Route path="/seasonal-treks" element={<SeasonalTreksPage />} />
+                <Route path="/" element={<HomePage />} />
+              </Routes>
+            </Box>
+            <Footer />
+          </Box>
         </AuthProvider>
       </Router>
     </ThemeProvider>

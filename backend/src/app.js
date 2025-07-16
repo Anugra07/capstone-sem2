@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRouter from './routes/auth.js';
 import aiRouter from './routes/ai.js';
 import seasonalTreksRouter from './routes/seasonalTreks.js';
+import savedTripsRouter from './routes/savedTrips.js';
 
 const app = express();
 
@@ -21,5 +22,6 @@ app.use('/api/auth', authRouter);
 app.use('/api/travel', (req, res) => res.send('Travel route'));
 app.use('/api/ai', aiRouter);
 app.use('/api/seasonal-treks', seasonalTreksRouter);
+app.use('/api/saved-trips', savedTripsRouter);
 
 export default app;

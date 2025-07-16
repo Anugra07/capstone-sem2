@@ -51,7 +51,7 @@ function SeasonalBanner() {
           backgroundImage: `linear-gradient(90deg, rgba(34,34,34,0.7) 0%, rgba(255,111,0,0.3) 100%), url(${bannerBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          borderRadius: 4,
+          // borderRadius: 4, // Removed curved border
           overflow: 'hidden',
           my: 4,
           px: { xs: 2, md: 6 },
@@ -62,7 +62,7 @@ function SeasonalBanner() {
       >
         <Box sx={{ zIndex: 2 }}>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
-            🌧️ Monsoon Magic: Best Treks & Escapes
+            Best Treks & Escapes
           </Typography>
           <Typography variant="body1" sx={{ mb: 2 }}>
             Explore best treks in this season.
@@ -75,7 +75,7 @@ function SeasonalBanner() {
             onClick={handleSeeDestinations}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'See Monsoon Destinations'}
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'See Destinations'}
           </Button>
         </Box>
       </Paper>
