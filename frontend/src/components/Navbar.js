@@ -96,7 +96,7 @@ function Navbar() {
                   display: { xs: 'none', sm: 'block' }
                 }}
               >
-                TravelGuide
+                WanderWise
               </Typography>
             </Box>
           </Link>

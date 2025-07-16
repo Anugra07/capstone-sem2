@@ -27,7 +27,7 @@ function Footer() {
           {/* Company Info */}
           <Grid item xs={12} md={4}>
             <Typography variant="h6" color="primary" gutterBottom sx={{ fontWeight: 700 }}>
-              Travel Guide India
+              WanderWise
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Discover India's hidden gems and plan your perfect adventure with our AI-powered travel recommendations.
@@ -141,7 +141,7 @@ function Footer() {
           textAlign: 'center' 
         }}>
           <Typography variant="body2" color="text.secondary">
-            © 2024 Travel Guide India. Made with ❤️ by{' '}
+            © 2024 WanderWise. Made with ❤️ by{' '}
             <Link 
               href="mailto:anugra.gupta2024@nst.rishihood.edu.in" 
               color="primary.main" 
