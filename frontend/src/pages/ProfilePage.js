@@ -311,7 +311,7 @@ function ProfilePage() {
 
         <Grid container spacing={3}>
           {/* Profile Card */}
-          <Grid item xs={12} lg={5}>
+          <Grid item xs={12} md={6} lg={4}>
             <Card
               elevation={24}
               sx={{
@@ -486,244 +486,241 @@ function ProfilePage() {
             </Card>
           </Grid>
 
-          {/* Right Side Container */}
-          <Grid item xs={12} lg={7}>
-            <Grid container spacing={3} direction="column" sx={{ height: '100%' }}>
-              {/* Saved Trips Section */}
-              <Grid item xs={12} sx={{ flex: 1 }}>
-                <Card
-                  elevation={24}
-                  sx={{
-                    borderRadius: 4,
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                  }}
-                >
-                  <CardContent sx={{ p: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <FlightTakeoffIcon sx={{ mr: 2, color: 'primary.main', fontSize: 28 }} />
-                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                          Saved Trips
-                        </Typography>
-                      </Box>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={refreshTrips}
-                        disabled={loadingTrips}
+          {/* Saved Trips Card */}
+          <Grid item xs={12} md={6} lg={4}>
+            <Card
+              elevation={24}
+              sx={{
+                borderRadius: 4,
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                height: '100%',
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <FlightTakeoffIcon sx={{ mr: 2, color: 'primary.main', fontSize: 28 }} />
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                      Saved Trips
+                    </Typography>
+                  </Box>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={refreshTrips}
+                    disabled={loadingTrips}
+                    sx={{
+                      textTransform: 'none',
+                      borderRadius: 2,
+                      borderColor: 'primary.main',
+                      color: 'primary.main',
+                      '&:hover': {
+                        borderColor: 'primary.dark',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                      },
+                    }}
+                  >
+                    {loadingTrips ? 'Refreshing...' : 'Refresh'}
+                  </Button>
+                </Box>
+
+                {loadingTrips ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress />
+                  </Box>
+                ) : savedTrips.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <FlightTakeoffIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary" gutterBottom>
+                      No saved trips yet
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                      Plan your first trip and save it to see it here!
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => navigate('/planner')}
+                      sx={{
+                        background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        px: 4,
+                        py: 1.5,
+                        borderRadius: 2,
+                      }}
+                    >
+                      Plan a Trip
+                    </Button>
+                  </Box>
+                ) : (
+                  <List>
+                    {savedTrips.map((trip) => (
+                      <ListItem
+                        key={trip.id}
                         sx={{
-                          textTransform: 'none',
+                          mb: 2,
                           borderRadius: 2,
-                          borderColor: 'primary.main',
-                          color: 'primary.main',
+                          border: '1px solid rgba(0,0,0,0.08)',
+                          background: 'rgba(255,255,255,0.5)',
                           '&:hover': {
-                            borderColor: 'primary.dark',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            background: 'rgba(255,255,255,0.8)',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                           },
                         }}
                       >
-                        {loadingTrips ? 'Refreshing...' : 'Refresh'}
-                      </Button>
-                    </Box>
+                        <ListItemText
+                          primary={
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                              {trip.title}
+                            </Typography>
+                          }
+                          secondary={
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                {trip.from} → {trip.to}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Saved on {formatDate(trip.createdAt)}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <IconButton
+                              onClick={() => handleViewTrip(trip)}
+                              sx={{ color: 'primary.main' }}
+                              title="View Trip"
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleDeleteTrip(trip.id)}
+                              sx={{ color: 'error.main' }}
+                              title="Delete Trip"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
 
-                    {loadingTrips ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                        <CircularProgress />
-                      </Box>
-                    ) : savedTrips.length === 0 ? (
-                      <Box sx={{ textAlign: 'center', py: 4 }}>
-                        <FlightTakeoffIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                        <Typography variant="h6" color="text.secondary" gutterBottom>
-                          No saved trips yet
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                          Plan your first trip and save it to see it here!
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          onClick={() => navigate('/planner')}
-                          sx={{
-                            background: 'linear-gradient(45deg, #667eea, #764ba2)',
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            px: 4,
-                            py: 1.5,
-                            borderRadius: 2,
-                          }}
-                        >
-                          Plan a Trip
-                        </Button>
-                      </Box>
-                    ) : (
-                      <List>
-                        {savedTrips.map((trip) => (
-                          <ListItem
-                            key={trip.id}
-                            sx={{
-                              mb: 2,
-                              borderRadius: 2,
-                              border: '1px solid rgba(0,0,0,0.08)',
-                              background: 'rgba(255,255,255,0.5)',
-                              '&:hover': {
-                                background: 'rgba(255,255,255,0.8)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                              },
-                            }}
-                          >
-                            <ListItemText
-                              primary={
-                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                  {trip.title}
-                                </Typography>
-                              }
-                              secondary={
-                                <Box>
-                                  <Typography variant="body2" color="text.secondary">
-                                    {trip.from} → {trip.to}
-                                  </Typography>
-                                  <Typography variant="caption" color="text.secondary">
-                                    Saved on {formatDate(trip.createdAt)}
-                                  </Typography>
-                                </Box>
-                              }
-                            />
-                            <ListItemSecondaryAction>
-                              <Box sx={{ display: 'flex', gap: 1 }}>
-                                <IconButton
-                                  onClick={() => handleViewTrip(trip)}
-                                  sx={{ color: 'primary.main' }}
-                                  title="View Trip"
-                                >
-                                  <VisibilityIcon />
-                                </IconButton>
-                                <IconButton
-                                  onClick={() => handleDeleteTrip(trip.id)}
-                                  sx={{ color: 'error.main' }}
-                                  title="Delete Trip"
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </Box>
-                            </ListItemSecondaryAction>
-                          </ListItem>
-                        ))}
-                      </List>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Stats Card */}
-              <Grid item xs={12} sx={{ flex: 1 }}>
-                <Paper
-                  elevation={8}
-                  sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    background: 'rgba(255, 255, 255, 0.9)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                  }}
-                >
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                    Account Statistics
-                  </Typography>
-                  
-                  <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      p: 2, 
-                      borderRadius: 2, 
-                      background: 'rgba(102, 126, 234, 0.1)',
-                      flex: 1,
-                      minWidth: { xs: '100%', sm: 'auto' }
-                    }}>
-                      <AccountCircleIcon sx={{ mr: 2, color: 'primary.main', fontSize: 28 }} />
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                          Account Type
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          Standard User
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      p: 2, 
-                      borderRadius: 2, 
-                      background: 'rgba(255, 107, 53, 0.1)',
-                      flex: 1,
-                      minWidth: { xs: '100%', sm: 'auto' }
-                    }}>
-                      <CalendarIcon sx={{ mr: 2, color: '#ff6b35', fontSize: 28 }} />
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                          Member Since
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {formatDate(user.createdAt)}
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      p: 2, 
-                      borderRadius: 2, 
-                      background: 'rgba(72, 187, 120, 0.1)',
-                      flex: 1,
-                      minWidth: { xs: '100%', sm: 'auto' }
-                    }}>
-                      <FlightTakeoffIcon sx={{ mr: 2, color: '#48bb78', fontSize: 28 }} />
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                          Saved Trips
-                        </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {savedTrips.length}
-                        </Typography>
-                      </Box>
-                    </Box>
+          {/* Account Statistics Card */}
+          <Grid item xs={12} md={12} lg={4}>
+            <Paper
+              elevation={8}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                height: '100%',
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                Account Statistics
+              </Typography>
+              
+              <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  p: 2, 
+                  borderRadius: 2, 
+                  background: 'rgba(102, 126, 234, 0.1)',
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: 'auto' }
+                }}>
+                  <AccountCircleIcon sx={{ mr: 2, color: 'primary.main', fontSize: 28 }} />
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      Account Type
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      Standard User
+                    </Typography>
                   </Box>
+                </Box>
 
-                  <Divider sx={{ my: 3 }} />
-
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Account Features
-                  </Typography>
-                  
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                    <Chip
-                      label="Travel Planning"
-                      size="small"
-                      sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
-                    />
-                    <Chip
-                      label="AI Recommendations"
-                      size="small"
-                      sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
-                    />
-                    <Chip
-                      label="Trip History"
-                      size="small"
-                      sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
-                    />
-                    <Chip
-                      label="Saved Trips"
-                      size="small"
-                      sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
-                    />
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  p: 2, 
+                  borderRadius: 2, 
+                  background: 'rgba(255, 107, 53, 0.1)',
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: 'auto' }
+                }}>
+                  <CalendarIcon sx={{ mr: 2, color: '#ff6b35', fontSize: 28 }} />
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      Member Since
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {formatDate(user.createdAt)}
+                    </Typography>
                   </Box>
-                </Paper>
-              </Grid>
-            </Grid>
+                </Box>
+
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  p: 2, 
+                  borderRadius: 2, 
+                  background: 'rgba(72, 187, 120, 0.1)',
+                  flex: 1,
+                  minWidth: { xs: '100%', sm: 'auto' }
+                }}>
+                  <FlightTakeoffIcon sx={{ mr: 2, color: '#48bb78', fontSize: 28 }} />
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      Saved Trips
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {savedTrips.length}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              <Divider sx={{ my: 3 }} />
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Account Features
+              </Typography>
+              
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                <Chip
+                  label="Travel Planning"
+                  size="small"
+                  sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
+                />
+                <Chip
+                  label="AI Recommendations"
+                  size="small"
+                  sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
+                />
+                <Chip
+                  label="Trip History"
+                  size="small"
+                  sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
+                />
+                <Chip
+                  label="Saved Trips"
+                  size="small"
+                  sx={{ background: 'linear-gradient(45deg, #667eea, #764ba2)', color: 'white' }}
+                />
+              </Box>
+            </Paper>
           </Grid>
         </Grid>
       </Box>
