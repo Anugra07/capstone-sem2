@@ -24,4 +24,9 @@ app.use('/api/ai', aiRouter);
 app.use('/api/seasonal-treks', seasonalTreksRouter);
 app.use('/api/saved-trips', savedTripsRouter);
 
+// Add this route to handle GET /
+app.get('/', (req, res) => {
+  res.send('API is running!');
+});
+
 export default app;
